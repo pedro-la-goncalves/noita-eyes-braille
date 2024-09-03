@@ -1,22 +1,23 @@
 export default {
-
-
-    fromDirectionToBinary(direction, inverted = false) {
-        if (inverted) {
-            return direction != 0 ? 1 : 0
-        }
-        
-        return direction == 0 ? 1 : 0
-    },
-
-    convertMessageToBinary(message, inverted = false) {
+    /**
+     * convert directions into binary, where:
+     * 1 | 2 | 3 | 4 ---> 0
+     *       0       ---> 1
+     */
+    convertMessageIntoBinary(message) {
         return message.map(line => [...line]
-            .map(direction => this.fromDirectionToBinary(direction, inverted))
+            .map(direction => direction == 0 ? 1 : 0)
         )
     },
-
-    invertBinaryMessage(message) {
-        return message.map(line => line.map(column => column == 0 ? 1 : 0))
+    
+    /**
+     * convert directions into binary, where:
+     * 1 | 2 | 3 | 4 ---> 1
+     *       0       ---> 0
+     */
+    convertMessageIntoInvertedBinary(message) {
+        return message.map(line => [...line]
+            .map(direction => direction != 0 ? 1 : 0)
+        )
     },
-
 }

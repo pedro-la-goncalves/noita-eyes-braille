@@ -259,7 +259,7 @@ var numbers = {
 }
 
 export default {
-    createCharacter: function (character) {
+    createCharacter(character) {
         const characterElement = document.createElement('div')
         characterElement.classList.add("braille-character")
         
@@ -274,21 +274,24 @@ export default {
         document.querySelector('.braille-message').appendChild(characterElement)
     },
     
-    createMessage: function (message) {
+    createMessage(message) {
         message.forEach(line => line.forEach(trigram => this.createCharacter(trigram)))
     },
     
-    convertTrigramsToDots: function (message) {
-        return message.map(line => line.map(trigram => trigram.map((value, valueIndex) => value === 1 ? (valueIndex + 1) : null).filter(dot => dot !== null)))
+    convertPairedBinaryTrigramsIntoDots(message) {
+        return message.map(pair => pair.flat())
+            .map(pair => pair.map((value, valueIndex) => value === 1 ? (valueIndex + 1) : null)
+            .filter(dot => dot !== null)
+        )
     },
 
-    sortKey: function (numbers) {
+    sortKey(numbers) {
         return ('' + numbers).split('').sort(function (a, b) {
           return a - b;
         }).join('');
     },
 
-    convertDots: function (value) {        
+    convertDots(value) {        
         var dotValue = numbers[value];
 
         if (dotValue || dotValue === null) {
@@ -299,10 +302,10 @@ export default {
     },
 
     toBraille(message) {
-        return message.flatMap(line => line.flatMap(trigram => this.convertDots(trigram.join('')))).join('')
+        return message.map(dots => this.convertDots(dots.join(''))).join('') 
     },
 
-    toText: function (message) {
+    toText(message) {
         return braille.toText(this.toBraille(message))
     }
 }

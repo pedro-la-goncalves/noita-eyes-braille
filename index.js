@@ -3,133 +3,95 @@ import MESSAGES from './messages.json' assert { type: 'json' }
 import * as fs from 'fs';
 
 import braille from './braille.js'
-import trigram from './trigram.js'
+import trigram, { TRIGRAM_METHODS } from './trigram.js'
 import binary from './binary.js'
 
 let data = {}
 
 for (let message in MESSAGES) {
     
-    /**
-     * convert directions into binary, where:
-     * 1 | 2 | 3 | 4 ---> 0
-     *       0       ---> 1
-     */
-    const binaryEyes = binary.convertMessageToBinary(MESSAGES[message])
+    const messageBinary = binary.convertMessageIntoBinary(MESSAGES[message])
 
-    /**
-     * convert directions into binary, where:
-     * 1 | 2 | 3 | 4 ---> 1
-     *       0       ---> 0
-     */
-    const invertedBinaryEyes = binary.convertMessageToBinary(MESSAGES[message], true)
+    const messageBinaryInverted = binary.convertMessageIntoInvertedBinary(MESSAGES[message])
 
+    data[message] = {
+        "message": MESSAGES[message].map(line => [...line].map(direction => Number(direction))),
+ 
+        "message-binary": messageBinary,
+        "message-binary-inverted": messageBinaryInverted,
+    }
 
+    Object.keys(TRIGRAM_METHODS).forEach(method => {
+        const trigramsBinary = trigram.groupEyesAsTrigrams(messageBinary, method)
+        
+        const trigramsQuantity = trigramsBinary.flat().length
+    
+        const trigramsBinaryPaired = trigram.groupTrigramsAsPairs(trigramsBinary)
+    
+        const dots = braille.convertPairedBinaryTrigramsIntoDots(trigramsBinaryPaired)
+        
+        const brailleMessage = braille.toBraille(dots)
+    
+        const text = braille.toText(dots)
 
-
-    /**
-     * using the wiki's order to generate trigrams
-     * <1> <2> <6>
-     *   <3> <5> <4>
-     */
-
-    // group binary eyes into trigram pairs
-    const wikiBinaryTrigrams = trigram.groupEyesAsTrigrams(binaryEyes, 'wiki')
-
-    const trigramsQuantity = wikiBinaryTrigrams.flat().length;
-
-    const wikiBinaryTrigramPairs = trigram.groupEyesAsTrigramPairs(binaryEyes, 'wiki')
-
-    // convert binary trigrams into dots
-    const wikiTrigramDots = braille.convertTrigramsToDots(wikiBinaryTrigramPairs)
-
-    // convert dots into braille
-    const wikiBrailleMessage = braille.toBraille(wikiTrigramDots);
-
-    // convert braille into text
-    const wikiMessageText = braille.toText(wikiTrigramDots)
-
-    // group binary eyes into trigrams
-    const invertedWikiBinaryTrigramPairs = trigram.groupEyesAsTrigramPairs(invertedBinaryEyes, 'wiki')
-
-    // convert binary trigrams into dots
-    const invertedWikiTrigramDots = braille.convertTrigramsToDots(invertedWikiBinaryTrigramPairs)
-
-    // convert dots into braille
-    const invertedWikiBrailleMessage = braille.toBraille(invertedWikiTrigramDots);
-
-    // convert braille into text
-    const invertedWikiMessageText = braille.toText(invertedWikiTrigramDots)
+        data[message][method] = {
+            "trigrams-quantity": trigramsQuantity,
+            "trigrams-binary": trigramsBinary,
+            "trigrams-binary-paired": trigramsBinaryPaired,
+            "dots": dots,
+            "braille": brailleMessage,
+            "text": text,
+        }
+    })
 
 
+    // // group binary eyes into trigrams
+    // const invertedWikiBinaryTrigramPairs = trigram.groupEyesAsTrigramPairs(invertedBinaryMessage, 'wiki')
 
-    /**
-     * using my own order to generate trigrams
-     * <1> <3> <5>
-     *   <2> <4> <6>
-     */
+    // // convert binary trigrams into dots
+    // const invertedWikiTrigramDots = braille.convertPairedTrigramsIntoDots(invertedWikiBinaryTrigramPairs)
 
-    // group binary eyes into trigrams
-    const pedrolaBinaryTrigrams = trigram.groupEyesAsTrigramPairs(binaryEyes, 'pedrola')
+    // // convert dots into braille
+    // const invertedWikiBrailleMessage = braille.toBraille(invertedWikiTrigramDots);
 
-    // convert binary trigrams into dots
-    const pedrolaTrigramDots = braille.convertTrigramsToDots(pedrolaBinaryTrigrams)
-
-    // convert dots into braille
-    const pedrolaBrailleMessage = braille.toBraille(pedrolaTrigramDots);
-
-    // convert braille into text
-    const pedrolaMessageText = braille.toText(pedrolaTrigramDots)
-
-    // group binary eyes into trigrams
-    const invertedPedrolaBinaryTrigrams = trigram.groupEyesAsTrigramPairs(invertedBinaryEyes, 'pedrola')
-
-    // convert binary trigrams into dots
-    const invertedPedrolaTrigramDots = braille.convertTrigramsToDots(invertedPedrolaBinaryTrigrams)
-
-    // convert dots into braille
-    const invertedPedrolaBrailleMessage = braille.toBraille(invertedPedrolaTrigramDots);
-
-    // convert braille into text
-    const invertedPedrolaMessageText = braille.toText(invertedPedrolaTrigramDots)
-
-
+    // // convert braille into text
+    // const invertedWikiMessageText = braille.toText(invertedWikiTrigramDots)
 
     // store all data
-    data[message] = {
-        'eyes-as-directions': MESSAGES[message],
-        'eyes-as-binary': binaryEyes,
-        'eyes-as-inverted-binary': invertedBinaryEyes,
-        'number-of-trigrams': trigramsQuantity,
+    // data[message] = {
+    //     'eyes-as-directions': MESSAGES[message],
+    //     'eyes-as-binary': binaryMessage,
+    //     'eyes-as-inverted-binary': invertedBinaryMessage,
+    //     'number-of-trigrams': trigramsQuantity,
 
-        'wiki': {
-            'binary-trigrams': wikiBinaryTrigramPairs,
-            'braille-dot-trigrams': wikiTrigramDots,
-            'braille': wikiBrailleMessage,
-            'text': wikiMessageText,
+    //     'wiki': {
+    //         'binary-trigrams': wikiBinaryTrigramPairs,
+    //         'braille-dot-trigrams': wikiTrigramDots,
+    //         'braille': wikiBrailleMessage,
+    //         'text': wikiMessageText,
 
-            'inverted': {
-                'binary-trigrams': invertedWikiBinaryTrigramPairs,
-                'braille-dot-trigrams': invertedWikiTrigramDots,
-                'braille': invertedWikiBrailleMessage,
-                'text': invertedWikiMessageText,
-            }
-        },
+    //         'inverted': {
+    //             'binary-trigrams': invertedWikiBinaryTrigramPairs,
+    //             'braille-dot-trigrams': invertedWikiTrigramDots,
+    //             'braille': invertedWikiBrailleMessage,
+    //             'text': invertedWikiMessageText,
+    //         }
+    //     },
 
-        'pedrola': {
-            'binary-trigrams': pedrolaBinaryTrigrams,
-            'braille-dot-trigrams': pedrolaTrigramDots,
-            'braille': pedrolaBrailleMessage,
-            'text': pedrolaMessageText,
+    //     'pedrola': {
+    //         'binary-trigrams': pedrolaBinaryTrigrams,
+    //         'braille-dot-trigrams': pedrolaTrigramDots,
+    //         'braille': pedrolaBrailleMessage,
+    //         'text': pedrolaMessageText,
 
-            'inverted': {
-                'binary-trigrams': invertedPedrolaBinaryTrigrams,
-                'braille-dot-trigrams': invertedPedrolaTrigramDots,
-                'braille': invertedPedrolaBrailleMessage,
-                'text': invertedPedrolaMessageText,
-            }
-        }
-    }
+    //         'inverted': {
+    //             'binary-trigrams': invertedPedrolaBinaryTrigrams,
+    //             'braille-dot-trigrams': invertedPedrolaTrigramDots,
+    //             'braille': invertedPedrolaBrailleMessage,
+    //             'text': invertedPedrolaMessageText,
+    //         }
+    //     }
+    // }
 
 }
 
