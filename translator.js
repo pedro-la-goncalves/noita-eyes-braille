@@ -2,49 +2,60 @@ import braille from './braille.js'
 import trigram, { TRIGRAM_METHODS } from './trigram.js'
 import binary from './binary.js'
 
-import MESSAGES from './messages.json' assert { type: 'json' }
-
 export default {
 
-    translate() {
+    translate(messages) {
 
         let data = {}
 
-        for (let message in MESSAGES) {
+        for (let message in messages) {
             
-            const messageBinary = binary.convertMessageIntoBinary(MESSAGES[message])
+            const messageAsBinaryUsingZeroesAsOnes = binary.convertMessageToBinaryUsingZeroesAsOnes(messages[message])
 
-            const messageBinaryInverted = binary.convertMessageIntoInvertedBinary(MESSAGES[message])
+            const messageAsBinaryUsingZeroesAsZeroes = binary.convertMessageToBinaryUsingZeroesAsZeroes(messages[message])
 
-            data[message] = {
-                "message": MESSAGES[message].map(line => [...line].map(direction => Number(direction))),
-                "message-binary": messageBinary,
-                "message-binary-inverted": messageBinaryInverted,
+            const BINARY_INTERPRETATIONS = {
+                "zeroes-as-ones": messageAsBinaryUsingZeroesAsOnes,
+                "zeroes-as-zeroes": messageAsBinaryUsingZeroesAsZeroes,
             }
 
-            Object.keys(TRIGRAM_METHODS).every(method => {
-                const trigramsBinary = trigram.groupEyesAsTrigrams(messageBinary, method)
+            Object.entries(BINARY_INTERPRETATIONS).forEach(([key, value]) => {
 
-                const trigramsQuantity = trigramsBinary.length
+                data[message] = data[message] == undefined ? {} : data[message]
 
-                if (message == 'west-1') console.log(trigramsQuantity);
-                
-                const trigramsBinaryPaired = trigram.groupTrigramsAsPairs(trigramsBinary)
-            
-                const dots = braille.convertPairedBinaryTrigramsIntoDots(trigramsBinaryPaired)
-                
-                const brailleMessage = braille.toBraille(dots)
-            
-                const text = braille.toText(dots)
-
-                data[message][method] = {
-                    "trigrams-quantity": trigramsQuantity,
-                    "trigrams-binary": trigramsBinary,
-                    "trigrams-binary-paired": trigramsBinaryPaired,
-                    "dots": dots,
-                    "braille": brailleMessage,
-                    "text": text,
+                data[message][key.toLocaleLowerCase()] = {
+                    "message-as-binary": value
                 }
+
+                Object.keys(TRIGRAM_METHODS).forEach(method => {
+
+                    const trigramsBinary = trigram.groupEyesAsTrigrams(value, TRIGRAM_METHODS[method])
+
+                    const trigramsQuantity = trigramsBinary.length
+
+                    const trigramsAsBinaryAndPaired = trigram.groupTrigramsAsPairs(trigramsBinary)
+                
+                    const dots = braille.convertPairedBinaryTrigramsIntoBrailleDots(trigramsAsBinaryAndPaired)
+                    
+                    const brailleCharacters = braille.convertDotsIntoBrailleCharacters(dots)
+                
+                    const text = braille.convertDotsIntoText(dots)
+
+                    data[message][key.toLocaleLowerCase()] = data[message][key.toLocaleLowerCase()] == undefined
+                        ? {}
+                        : data[message][key.toLocaleLowerCase()]
+
+                    data[message][key.toLocaleLowerCase()][TRIGRAM_METHODS[method]] = {
+                        "trigrams-quantity": trigramsQuantity,
+                        "trigrams-as-binary": trigramsBinary,
+                        "trigrams-as-binary-and-paired": trigramsAsBinaryAndPaired,
+                        "braille-dots": dots,
+                        "braille-characters": brailleCharacters,
+                        "text": text,
+                    }
+
+                })
+
             })
 
             // // group binary eyes into trigrams

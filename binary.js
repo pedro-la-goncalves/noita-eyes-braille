@@ -4,7 +4,7 @@ export default {
      * 1 | 2 | 3 | 4 ---> 0
      *       0       ---> 1
      */
-    convertMessageIntoBinary(message) {
+    convertMessageToBinaryUsingZeroesAsOnes(message) {
         return message.map(line => [...line]
             .map(direction => direction == 0 ? 1 : 0)
         )
@@ -15,9 +15,9 @@ export default {
      * 1 | 2 | 3 | 4 ---> 1
      *       0       ---> 0
      */
-    convertMessageIntoInvertedBinary(message) {
+    convertMessageToBinaryUsingZeroesAsZeroes(message) {
         return message.map(line => [...line]
-            .map(direction => direction != 0 ? 1 : 0)
+            .map(direction => direction == 0 ? 0 : 1)
         )
     },
 }

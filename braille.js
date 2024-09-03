@@ -259,26 +259,11 @@ var numbers = {
 }
 
 export default {
-    createCharacter(character) {
-        const characterElement = document.createElement('div')
-        characterElement.classList.add("braille-character")
-        
-        character.forEach(dot => {
-            const dotElement = document.createElement('div')
-            dotElement.classList.add("braille-character__dot")
-            if (dot) dotElement.classList.add("braille-character__dot--active")
-            
-            characterElement.appendChild(dotElement)
-        });
-    
-        document.querySelector('.braille-message').appendChild(characterElement)
-    },
-    
-    createMessage(message) {
-        message.forEach(line => line.forEach(trigram => this.createCharacter(trigram)))
-    },
-    
-    convertPairedBinaryTrigramsIntoDots(message) {
+
+    /**
+     * uses the eye's index to represent the braille dot
+     */
+    convertPairedBinaryTrigramsIntoBrailleDots(message) {
         return message.map(pair => pair.flat())
             .map(pair => pair.map((value, valueIndex) => value === 1 ? (valueIndex + 1) : null)
             .filter(dot => dot !== null)
@@ -301,11 +286,11 @@ export default {
         return numbers[value] || numbers[this.sortKey(value)] || '⠀';
     },
 
-    toBraille(message) {
+    convertDotsIntoBrailleCharacters(message) {
         return message.map(dots => this.convertDots(dots.join(''))).join('') 
     },
 
-    toText(message) {
-        return braille.toText(this.toBraille(message))
+    convertDotsIntoText(message) {
+        return braille.toText(this.convertDotsIntoBrailleCharacters(message))
     }
 }

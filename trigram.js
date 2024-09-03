@@ -1,7 +1,6 @@
 export const TRIGRAM_METHODS = {
-    WIKI: 'WIKI',
-    ZIGZAG: 'ZIGZAG',
-    ZIGGAZ: 'ZIGGAZ',
+    WIKI: 'wiki',
+    ZIGZAG: 'zigzag'
 }
 
 export default {
@@ -45,32 +44,54 @@ export default {
     },
 
     /**
-     * <1> <3> <5>
-     *   <2> <4> <6>
+     * <1> <3>
+     *   <2>
      */
-    zigzagTrigramPair(splittedMessage, line, column) {
-        let firstTrigram = []
-        let secondTrigram = []
+    zigzagPointingDownTrigram(message, line, column) {
+        let trigram = []
 
-        if (splittedMessage[line][column] != undefined) firstTrigram.push(splittedMessage[line][column])
-        if (splittedMessage[line + 1][column] != undefined) firstTrigram.push(splittedMessage[line + 1][column])
-        if (splittedMessage[line][column + 1] != undefined) firstTrigram.push(splittedMessage[line][column + 1])
+        if (message[line] != undefined && message[line][column] != undefined)
+            trigram.push(message[line][column])
 
-        if (splittedMessage[line + 1][column + 1] != undefined) secondTrigram.push(splittedMessage[line + 1][column + 1])
-        if (splittedMessage[line][column + 2] != undefined) secondTrigram.push(splittedMessage[line][column + 2])
-        if (splittedMessage[line + 1][column + 2] != undefined) secondTrigram.push(splittedMessage[line + 1][column + 2])
+        if (message[line] != undefined && message[line + 1][column] != undefined)
+            trigram.push(message[line + 1][column])
 
-        return [...firstTrigram, ...secondTrigram]
+        if (message[line] != undefined && message[line][column + 1] != undefined)
+            trigram.push(message[line][column + 1])
+
+        return trigram
     },
 
-    groupEyesAsTrigrams(message, method = 'wiki') {
+    /**
+     *    <6>
+     *  <5> <4>
+     */
+    zigzagPointingUpTrigram(message, line, column) {
+        let trigram = []
+
+        if (message[line + 1] != undefined && message[line + 1][column + 1] != undefined) 
+            trigram.push(message[line + 1][column + 1])
+
+        if (message[line] != undefined && message[line][column + 2] != undefined) 
+            trigram.push(message[line][column + 2])
+
+        if (message[line + 1] != undefined && message[line + 1][column + 2] != undefined)
+            trigram.push(message[line + 1][column + 2])
+
+        return trigram
+    },
+
+    groupEyesAsTrigrams(message, method = TRIGRAM_METHODS.WIKI) {
         let trigramMessage = []
 
         for (let line = 0; line < message.length; line += 2) {            
-            for (let column = 0; column < message[line].length; column += 3) {                  
-                if (method.toUpperCase() === TRIGRAM_METHODS.WIKI) {
-                    trigramMessage.push(this.wikiPointingUpTrigram(message, line, column))
+            for (let column = 0; column < message[line].length; column += 3) {
+                if (method == TRIGRAM_METHODS.WIKI) {    
                     trigramMessage.push(this.wikiPointingDownTrigram(message, line, column))
+                    trigramMessage.push(this.wikiPointingUpTrigram(message, line, column))
+                } else if (method == TRIGRAM_METHODS.ZIGZAG) {    
+                    trigramMessage.push(this.zigzagPointingDownTrigram(message, line, column))
+                    trigramMessage.push(this.zigzagPointingUpTrigram(message, line, column))
                 }
             }
         }
