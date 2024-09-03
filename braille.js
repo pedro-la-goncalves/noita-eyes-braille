@@ -277,17 +277,15 @@ export default {
     },
 
     convertDots(value) {        
-        var dotValue = numbers[value];
+        var dotValue = numbers[value]
 
-        if (dotValue || dotValue === null) {
-          return dotValue;
-        }
+        if (dotValue || dotValue === null) return dotValue
 
-        return numbers[value] || numbers[this.sortKey(value)] || '⠀';
+        return numbers[value] || numbers[this.sortKey(value)] || '⠀'
     },
 
     convertDotsIntoBrailleCharacters(message) {
-        return message.map(dots => this.convertDots(dots.join(''))).join('') 
+        return message.map(dots => this.convertDots(dots.join(''))).join('')
     },
 
     convertDotsIntoText(message) {

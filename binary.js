@@ -1,4 +1,5 @@
 export default {
+
     /**
      * convert directions into binary, where:
      * 1 | 2 | 3 | 4 ---> 0
@@ -20,4 +21,5 @@ export default {
             .map(direction => direction == 0 ? 0 : 1)
         )
     },
+    
 }

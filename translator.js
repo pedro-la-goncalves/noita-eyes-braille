@@ -5,7 +5,7 @@ import binary from './binary.js'
 export default {
 
     translate(messages) {
-
+        
         let data = {}
 
         for (let message in messages) {
@@ -57,18 +57,6 @@ export default {
                 })
 
             })
-
-            // // group binary eyes into trigrams
-            // const invertedWikiBinaryTrigramPairs = trigram.groupEyesAsTrigramPairs(invertedBinaryMessage, 'wiki')
-
-            // // convert binary trigrams into dots
-            // const invertedWikiTrigramDots = braille.convertPairedTrigramsIntoDots(invertedWikiBinaryTrigramPairs)
-
-            // // convert dots into braille
-            // const invertedWikiBrailleMessage = braille.toBraille(invertedWikiTrigramDots);
-
-            // // convert braille into text
-            // const invertedWikiMessageText = braille.toText(invertedWikiTrigramDots)
 
         }
 
