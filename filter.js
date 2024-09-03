@@ -1,9 +1,14 @@
-import DATA from './data.json' assert { type: 'json' }
+import _ from 'lodash'
 
-const filteredData = {}
+export default {
 
-Object.entries(DATA).forEach(([key, value]) => {
-    filteredData[key] = value.WIKI.braille
-})
-
-console.log(filteredData)
+    filterData(data, filter) {
+        let filteredData = {}
+        
+        Object.entries(data).forEach(([key, value]) => {
+            filteredData[key] = _.get(value, filter)
+        })
+        
+        return filteredData
+    }
+}
