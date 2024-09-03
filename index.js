@@ -9,8 +9,8 @@ const data = translator.translate(MESSAGES)
 
 // filters for specific data of each message
 // const dataFilteredBySubitem = filter.filterData(data, 'zeroes-as-ones.message-as-binary')
-const dataFilteredBySubitem = filter.filterData(data, 'zeroes-as-ones.wiki.braille-characters')
-// const dataFilteredBySubitem = filter.filterData(data)
+// const dataFilteredBySubitem = filter.filterData(data, 'zeroes-as-ones.wiki.braille-characters')
+const dataFilteredBySubitem = filter.filterData(data)
 
 // filters for data for each message
 // const dataFilteredByMessage = dataFilteredBySubitem['west-1']
